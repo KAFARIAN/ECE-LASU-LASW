@@ -425,29 +425,29 @@ def serve_frontend(path):
     """Serve gpt.html, gpt.css, gpt_rag.js from root folder"""
     # Map files to their names
     if path == '' or path == 'index.html':
-        return send_from_directory('.', 'gpt.html')
+        return send_from_directory('.', 'index.html')
     elif path == 'gpt.css':
         return send_from_directory('.', 'gpt.css')
     elif path == 'gpt_rag.js':
         return send_from_directory('.', 'gpt_rag.js')
     else:
         # Serve gpt.html as fallback for any other path (SPA style)
-        return send_from_directory('.', 'gpt.html')
+        return send_from_directory('.', 'index.html')
 
 # ────────────────────────────────────────────────────────────────────────
 # Main Entry Point
 # ────────────────────────────────────────────────────────────────────────
 if __name__ == '__main__':
     PDF_PATHS = [
-        r"C:/Users/Waniko Sebastine/Desktop/FYP/pdf/Report-sample.pdf",
-        r"C:/Users/Waniko Sebastine/Desktop/FYP/pdf/grainger-allisons-diagnostic-radiology-5th-edition-part-1.pdf",
-        r"C:/Users/Waniko Sebastine/Desktop/FYP/pdf/grainger-allisons-diagnostic-radiology-5th-edition-part-2.pdf",
-        r"C:/Users/Waniko Sebastine/Desktop/FYP/pdf/grainger-allisons-diagnostic-radiology-5th-edition-part-3.pdf",
-        r"C:/Users/Waniko Sebastine/Desktop/FYP/pdf/grainger-allisons-diagnostic-radiology-5th-edition-part-4.pdf",
-        r"C:/Users/Waniko Sebastine/Desktop/FYP/pdf/grainger-allisons-diagnostic-radiology-5th-edition-part-5.pdf",
-        r"C:/Users/Waniko Sebastine/Desktop/FYP/pdf/grainger-allisons-diagnostic-radiology-5th-edition-part-6.pdf",
-        r"C:/Users/Waniko Sebastine/Desktop/FYP/pdf/grainger-allisons-diagnostic-radiology-5th-edition-part-7.pdf",
-        r"C:/Users/Waniko Sebastine/Desktop/FYP/pdf/grainger-allisons-diagnostic-radiology-5th-edition-part-8.pdf",
+        r"/pdf/Report-sample.pdf",
+        r"/pdf/grainger-allisons-diagnostic-radiology-5th-edition-part-1.pdf",
+        r"/pdf/grainger-allisons-diagnostic-radiology-5th-edition-part-2.pdf",
+        r"/pdf/grainger-allisons-diagnostic-radiology-5th-edition-part-3.pdf",
+        r"/pdf/grainger-allisons-diagnostic-radiology-5th-edition-part-4.pdf",
+        r"/pdf/grainger-allisons-diagnostic-radiology-5th-edition-part-5.pdf",
+        r"/pdf/grainger-allisons-diagnostic-radiology-5th-edition-part-6.pdf",
+        r"/pdf/grainger-allisons-diagnostic-radiology-5th-edition-part-7.pdf",
+        r"/pdf/grainger-allisons-diagnostic-radiology-5th-edition-part-8.pdf",
     ]
 
     INDEX_DIR = "radiology_faiss_index"
@@ -457,6 +457,7 @@ if __name__ == '__main__':
     else:
         print("Found existing FAISS index → skipping creation")
 
+    port = int(os.environ.get('PORT', 5000))
     initialize_app_services()
 
     print("\n" + "-"*70)
@@ -464,4 +465,4 @@ if __name__ == '__main__':
     print("Capabilities: RAG (Qwen), Vision (Moondream), Image Gen (SDXL)")
     print("-"*70 + "\n")
 
-    app.run(debug=False, host='0.0.0.0', port=5000, threaded=True)
+    app.run(host='0.0.0.0', port=port, debug=False)
