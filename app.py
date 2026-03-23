@@ -440,7 +440,14 @@ def serve_frontend(path):
 if __name__ == '__main__':
     PDF_PATHS = [
         r"C:/Users/Waniko Sebastine/Desktop/FYP/pdf/Report-sample.pdf",
-        r"C:/Users/Waniko Sebastine/Desktop/FYP/pdf/grainger-allisons-diagnostic-radiology-5th-edition_compress.pdf"
+        r"C:/Users/Waniko Sebastine/Desktop/FYP/pdf/grainger-allisons-diagnostic-radiology-5th-edition-part-1.pdf",
+        r"C:/Users/Waniko Sebastine/Desktop/FYP/pdf/grainger-allisons-diagnostic-radiology-5th-edition-part-2.pdf",
+        r"C:/Users/Waniko Sebastine/Desktop/FYP/pdf/grainger-allisons-diagnostic-radiology-5th-edition-part-3.pdf",
+        r"C:/Users/Waniko Sebastine/Desktop/FYP/pdf/grainger-allisons-diagnostic-radiology-5th-edition-part-4.pdf",
+        r"C:/Users/Waniko Sebastine/Desktop/FYP/pdf/grainger-allisons-diagnostic-radiology-5th-edition-part-5.pdf",
+        r"C:/Users/Waniko Sebastine/Desktop/FYP/pdf/grainger-allisons-diagnostic-radiology-5th-edition-part-6.pdf",
+        r"C:/Users/Waniko Sebastine/Desktop/FYP/pdf/grainger-allisons-diagnostic-radiology-5th-edition-part-7.pdf",
+        r"C:/Users/Waniko Sebastine/Desktop/FYP/pdf/grainger-allisons-diagnostic-radiology-5th-edition-part-8.pdf",
     ]
 
     INDEX_DIR = "radiology_faiss_index"
