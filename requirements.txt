@@ -1,8 +1,14 @@
-flask==3.0.0
-flask-cors==4.0.0
+Flask==3.0.0
+Flask-CORS==4.0.0
 torch
 diffusers
+accelerate
+transformers
 langchain-community
 langchain-ollama
-ollama
+langchain-core
+langgraph
 faiss-cpu
+werkzeug
+PyPDF2
+python-dotenv
