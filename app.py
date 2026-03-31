@@ -416,23 +416,20 @@ def chat():
         return jsonify({'reply': f'Internal error: {str(e)}'}), 500
 
 
-# ────────────────────────────────────────────────────────────────────────
-# Frontend Serving Routes (Fixes 404 on http://localhost:5000)
-# ────────────────────────────────────────────────────────────────────────
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
 def serve_frontend(path):
-    """Serve gpt.html, gpt.css, gpt_rag.js from root folder"""
-    # Map files to their names
-    if path == '' or path == 'index.html':
-        return send_from_directory('.', 'index.html')
+    """Serve gpt.html from templates/, CSS/JS from static/, SPA fallback."""
+    if path == '' or path == 'index.html' or path.endswith('.html'):
+        return render_template('gpt.html')  # Processes Jinja2 templates properly
     elif path == 'gpt.css':
-        return send_from_directory('.', 'gpt.css')
+        return send_from_directory('static', 'gpt.css')
     elif path == 'gpt_rag.js':
-        return send_from_directory('.', 'gpt_rag.js')
-    else:
-        # Serve gpt.html as fallback for any other path (SPA style)
-        return send_from_directory('.', 'index.html')
+        return send_from_directory('static', 'gpt_rag.js')
+    # Flask auto-serves /static/<file> but catch others as SPA fallback
+    if path.startswith('static/'):
+        return send_from_directory('static', path[7:])  # Strip 'static/' prefix
+    return render_template('gpt.html')  # SPA fallback for client-side routes
 
 # ────────────────────────────────────────────────────────────────────────
 # Main Entry Point
@@ -457,7 +454,6 @@ if __name__ == '__main__':
     else:
         print("Found existing FAISS index → skipping creation")
 
-    port = int(os.environ.get('PORT', 5000))
     initialize_app_services()
 
     print("\n" + "-"*70)
@@ -465,4 +461,4 @@ if __name__ == '__main__':
     print("Capabilities: RAG (Qwen), Vision (Moondream), Image Gen (SDXL)")
     print("-"*70 + "\n")
 
-    app.run(host='0.0.0.0', port=port, debug=False)
+    app.run(debug=False, host='0.0.0.0', port=5000, threaded=True)
