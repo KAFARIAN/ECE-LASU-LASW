@@ -1,5 +1,5 @@
-Flask
-Flask-CORS
+flask
+flask-cors
 torch
 diffusers
 accelerate
@@ -10,6 +10,5 @@ langchain-core
 langgraph
 faiss-cpu
 werkzeug
-PyPDF2
+pypdf2
 python-dotenv
-sentence-transformers
