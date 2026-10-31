@@ -1,14 +1,43 @@
+# requirements.txt - ECE-LASU-LASW (Expert-Level Radiology AI Assistant)
+# Python 3.12+ recommended. Install with:  pip install -r requirements.txt
+#
+# Versions marked "pinned" are the exact ones your .spec file bundles
+# (the .dist-info lines), so they must match or the PyInstaller build fails.
+# Everything else is unpinned. To lock exact versions from your working .venv:
+#   pip freeze > requirements.lock.txt
+
+# --- Web server ---
 flask
 flask-cors
-langchain
-langchain-groq
-langchain-huggingface
-langchain-community
-langchain-core
+werkzeug
+requests
+
+# --- Desktop window ---
+pywebview
+
+# --- LangChain / RAG / agent (pinned to match ECE-LASU-LASW.spec) ---
+langchain-classic==1.0.7
+langchain-community==0.4.2
+langchain-core==1.4.0
+langchain-ollama==1.1.0
+langchain-text-splitters==1.1.2
 langgraph
 faiss-cpu
-sentence-transformers
-requests
-werkzeug
 pypdf
-gunicorn
+
+# --- Image generation (SDXL) ---
+torch
+diffusers
+transformers
+accelerate
+safetensors
+
+# --- CT / DICOM pipeline ---
+TotalSegmentator
+nibabel
+numpy
+pydicom
+pillow
+
+# --- Build only (not needed to run the app from source) ---
+# pyinstaller

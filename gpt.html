@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html data-theme="dark">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <!-- Font Awesome — local bundle (works fully offline) -->
+        <link rel="stylesheet" href="fontawesome/css/all.min.css">
+        <!-- Bootstrap CSS — if you also want offline, download it similarly -->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
+        <link rel="stylesheet" type="text/css" href="gpt.css">
+        <link rel="icon" href="Profile.ico">
+        <title>ECE-LASU-LASW</title>
+    </head>
+
+    <body>
+
+        <!-- ── LOADING SCREEN ─────────────────────────────────── -->
+        <div id="loading-screen" class="loading-screen">
+            <div class="loading-content">
+                <div class="loading-logo">
+                    <i class="fas fa-lungs-virus"></i>
+                </div>
+                <h1 class="loading-title">ECE-LASU-LASW</h1>
+                <p class="loading-subtitle">Expert-Level Radiology AI Assistant</p>
+
+                <div class="loading-steps">
+                    <div class="loading-step" id="step-server">
+                        <i class="fas fa-circle-notch fa-spin"></i>
+                        <span>Starting server...</span>
+                    </div>
+                    <div class="loading-step" id="step-rag">
+                        <i class="fas fa-circle-notch fa-spin"></i>
+                        <span>Loading knowledge base...</span>
+                    </div>
+                    <div class="loading-step" id="step-sdxl">
+                        <i class="fas fa-circle-notch fa-spin"></i>
+                        <span>Loading image generation model...</span>
+                    </div>
+                </div>
+
+                <div class="loading-bar-track">
+                    <div class="loading-bar-fill" id="loading-bar-fill"></div>
+                </div>
+                <p class="loading-hint">First launch may take a few minutes while models load.</p>
+            </div>
+        </div>
+
+        <!-- ── PATIENT INFO MODAL ─────────────────────────────── -->
+        <div id="patient-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-label="Patient information">
+            <div class="modal-card">
+                <div class="modal-header">
+                    <i class="fa-regular fa-hospital"></i>
+                    <h2>Patient Information</h2>
+                </div>
+                <p class="modal-subtitle">This will be included in the generated radiology report.</p>
+
+                <div class="modal-field">
+                    <label for="patient-name">Full Name</label>
+                    <input type="text" id="patient-name" placeholder="e.g. John Doe" autocomplete="off">
+                </div>
+
+                <div class="modal-field-row">
+                    <div class="modal-field">
+                        <label for="patient-sex">Sex</label>
+                        <select id="patient-sex">
+                            <option value="">Select</option>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                        </select>
+                    </div>
+                    <div class="modal-field">
+                        <label for="patient-age">Age</label>
+                        <input type="number" id="patient-age" placeholder="e.g. 45" min="0" max="120">
+                    </div>
+                </div>
+
+                <div class="modal-field">
+                    <label for="patient-id">Patient / Case ID <span class="optional-tag">optional</span></label>
+                    <input type="text" id="patient-id" placeholder="e.g. RAD-2026-0142" autocomplete="off">
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="modal-btn-cancel" id="patient-modal-cancel">Cancel</button>
+                    <button type="button" class="modal-btn-confirm" id="patient-modal-confirm">
+                        <i class="fa-regular fa-hospital"></i> Generate Report
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- ── CT SCAN UPLOAD CHOICE MODAL ────────────────────── -->
+        <div id="ct-choice-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-label="Choose CT upload method">
+            <div class="modal-card">
+                <div class="modal-header">
+                    <i class="fa-solid fa-cubes"></i>
+                    <h2>Upload CT Scan</h2>
+                </div>
+                <p class="modal-subtitle">Choose how you'd like to provide the DICOM series.</p>
+
+                <div class="ct-choice-options">
+                    <button type="button" class="ct-choice-btn" id="ct-choice-folder">
+                        <i class="fa-solid fa-folder-open"></i>
+                        <span>Upload Folder</span>
+                    </button>
+                    <button type="button" class="ct-choice-btn" id="ct-choice-zip">
+                        <i class="fa-solid fa-file-zipper"></i>
+                        <span>Upload .zip File</span>
+                    </button>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="modal-btn-cancel" id="ct-choice-cancel">Cancel</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── CT SCAN PROGRESS MODAL ─────────────────────────── -->
+        <div id="ct-progress-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-label="CT scan analysis progress">
+            <div class="modal-card">
+                <div class="modal-header">
+                    <i class="fa-solid fa-cubes"></i>
+                    <h2>Analyzing CT Volume</h2>
+                </div>
+                <p class="modal-subtitle">This runs locally and may take several minutes.</p>
+
+                <div class="loading-steps" style="margin: 20px 0;">
+                    <div class="loading-step" id="ct-step-upload">
+                        <i class="fas fa-circle-notch fa-spin"></i>
+                        <span>Uploading DICOM series...</span>
+                    </div>
+                    <div class="loading-step" id="ct-step-memory">
+                        <i class="fas fa-circle-notch fa-spin"></i>
+                        <span>Freeing memory (unloading AI models)...</span>
+                    </div>
+                    <div class="loading-step" id="ct-step-segment">
+                        <i class="fas fa-circle-notch fa-spin"></i>
+                        <span>Segmenting volume (TotalSegmentator)...</span>
+                    </div>
+                    <div class="loading-step" id="ct-step-report">
+                        <i class="fas fa-circle-notch fa-spin"></i>
+                        <span>Generating report...</span>
+                    </div>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="modal-btn-cancel" id="ct-progress-cancel">Close</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── CONSOLE DRAWER ─────────────────────────────────── -->
+        <div id="console-drawer" class="console-drawer">
+            <div class="console-header">
+                <span><i class="fas fa-terminal"></i> System Console</span>
+                <div class="console-header-actions">
+                    <button id="console-copy-btn" title="Copy all logs"><i class="fas fa-copy"></i></button>
+                    <button id="console-clear-btn" title="Clear display"><i class="fas fa-eraser"></i></button>
+                    <button id="console-close-btn" title="Close console"><i class="fas fa-times"></i></button>
+                </div>
+            </div>
+            <div class="console-body" id="console-body">
+                <p class="console-empty">Waiting for logs...</p>
+            </div>
+        </div>
+        <button id="console-toggle-btn" class="console-toggle-btn" title="Toggle system console">
+            <i class="fas fa-terminal"></i>
+        </button>
+
+        <!-- ── LIGHTBOX OVERLAY ───────────────────────────────── -->
+        <div id="lightbox" class="lightbox" role="dialog" aria-modal="true" aria-label="Image viewer">
+            <button class="lightbox-close" id="lightbox-close" title="Close"><i class="fas fa-times"></i></button>
+            <img id="lightbox-img" src="" alt="Medical Visualization">
+        </div>
+
+        <!-- ── TOAST CONTAINER ───────────────────────────────── -->
+        <div id="toast-container" class="toast-container" aria-live="polite"></div>
+
+        <!-- ── SCROLL TO BOTTOM BUTTON ───────────────────────── -->
+        <button id="scroll-btn" class="scroll-btn" title="Scroll to bottom" aria-label="Scroll to bottom">
+            <i class="fas fa-chevron-down"></i>
+        </button>
+
+        <!-- ── HISTORY SECTION ───────────────────────────────── -->
+        <nav>
+            <div class="trademark" style="display: flex; align-items: center;">
+                <button id="menu-btn" class="hamburger-btn" style="display: none; background: none; border: none; color: white; font-size: 20px; margin-left: 15px; cursor: pointer;">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="logo">EXPERT-LEVEL RADIOLOGY AI ASSISTANT</div>
+            </div>
+            <!-- Nav right-side controls -->
+            <div class="nav-controls">
+                <button id="theme-btn" class="nav-icon-btn" title="Toggle light/dark theme" aria-label="Toggle theme">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <button id="export-btn" class="nav-icon-btn" title="Export conversation" aria-label="Export conversation">
+                    <i class="fas fa-download"></i>
+                </button>
+                <button id="copy-all-btn" class="nav-icon-btn" title="Copy entire conversation" aria-label="Copy conversation">
+                    <i class="fas fa-copy"></i>
+                </button>
+            </div>
+        </nav>
+
+        <div class="chat-history" id="chat-history">
+            <div style="margin-left: 15px;">
+                <button type="submit" class="chat-btn" id="new-chat">
+                    <i class="fa-regular fa-message"></i> New Chat
+                </button>
+            </div>
+            <div class="chat-current" id="chat-current">
+                <div class="message-current" id="message-current"></div>
+            </div>
+
+            <!-- Sidebar search -->
+            <div class="sidebar-search-wrap">
+                <i class="fas fa-search sidebar-search-icon"></i>
+                <input type="text" id="history-search" class="sidebar-search" placeholder="Search history..." aria-label="Search conversation history">
+            </div>
+
+            <p class="recent">Recent</p>
+            <div class="history-container" id="history-sidebar">
+                <div id="history-list">
+                    <p class="history">No History Yet...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── CHAT SECTION ──────────────────────────────────── -->
+        <div class="chat-body" id="chat-body">
+            <div class="chat-section" id="chat-section">
+                <div style="margin-top: 30px;">
+                    <div id="chatbox">
+                        <div class="message bot-message">
+                            <div class="content">Hello! How can I assist you today?</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="chat-input">
+                <div class="input-container">
+                    <textarea id="text-message" class="text-message" placeholder="Paste clinical notes or type a prompt..." rows="1" required aria-label="Message input"></textarea>
+                    <button type="button" id="send-btn" class="send-btn" title="Send message (Enter)">
+                        <i class="fas fa-paper-plane" style="font-size: 10px; margin-left: -2px;"></i>
+                    </button>
+                </div>
+
+                <!-- Char counter + keyboard hint -->
+                <div class="input-meta-row">
+                    <span class="keyboard-hint"><kbd>Enter</kbd> send &nbsp;·&nbsp; <kbd>Shift+Enter</kbd> new line</span>
+                    <span class="char-counter" id="char-counter">0 chars</span>
+                </div>
+
+                <div class="action-buttons-row">
+                    <div class="left-actions">
+                        <button type="button" class="other-btn" id="mic-btn" title="Voice Input"><i class="fas fa-microphone" style="font-size: 12px; margin-left: -1px;"></i></button>
+                        <button type="button" class="other-btn" id="image-upload-btn" title="Upload Scan"><i class="fas fa-paperclip" style="font-size: 12px; margin-left: -1px;"></i></button>
+                    </div>
+                    <div class="right-actions">
+                        <button type="button" class="other-btn agent-btn" id="extract-btn" title="Extract Data">
+                            <i class="fa-regular fa-clipboard"></i> <span>Extract</span>
+                        </button>
+                        <button type="button" class="other-btn agent-btn" id="report-btn" title="Generate Report">
+                            <i class="fa-regular fa-hospital"></i> <span>Report</span>
+                        </button>
+                        <button type="button" class="other-btn agent-btn" id="ct-scan-btn" title="Analyze 3D CT Volume">
+                            <i class="fa-solid fa-cubes"></i> <span>CT Scan</span>
+                        </button>
+                    </div>
+                    <input type="file" id="image-input" accept="image/png, image/jpeg" style="display: none;">
+                    <input type="file" id="ct-scan-input" webkitdirectory directory multiple style="display: none;">
+                    <input type="file" id="ct-scan-zip-input" accept=".zip" style="display: none;">
+                </div>
+            </div>
+        </div>
+
+        <script src="gpt_rag.js" defer></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js" integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q" crossorigin="anonymous"></script>
+    </body>
+</html>
